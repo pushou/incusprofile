@@ -23,18 +23,26 @@ config:
       - liblzma-dev
       - libssh-dev
       - python3-pip
+      - tcpdump
+      - ssh
     runcmd:
       - |
         #!/bin/bash
         set -e
         # Installation de networklab
         sudo python3 -m pip install networklab --break-system-packages
+
         # Installation des dépendances pour netlab (ubuntu, ansible)
         sudo netlab install -y ubuntu ansible containerlab
-        # Installation de Containerlab
-        #sudo curl -sL https://containerlab.dev/setup | sudo -E bash -s "all"
+
         # Clonage du dépôt bgplab dans /root/bgplab
         sudo git clone https://github.com/bgplab/bgplab.git /root/bgplab
+        sudo git clone https://github.com/ipspace/netlab-examples.git /root/netlab-examples
+        sudo docker image pull registry.iutbeziers.fr/ceos:4.33.1F
+
+        # Installation de fzf avec réponse automatique
+        git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+        echo "yes" | ~/.fzf/install
 
     # Définition du fuseau horaire
     timezone: Europe/Paris
