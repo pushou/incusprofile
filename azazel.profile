@@ -7,16 +7,14 @@ config:
       - git
       - curl
       - wget
-      - qemu-system
       - suricata
       - elfutils
       - locate
-      - libguestfs-tools
-      - xorriso
       - tcpdump
       - file
       - build-essential 
       - ca-certificates
+      - jq
       
 
     write_files:
