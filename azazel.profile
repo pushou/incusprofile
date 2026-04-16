@@ -61,11 +61,20 @@ config:
         apt update
         apt -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
+
         # Installation d'azazel
         cd /root
         git clone https://github.com/beelzebub-labs/azazel.git
         cd azazel
-        make docker-dev        
+        make docker-dev
+        make docker-dev-run
+        make vmlinux
+        make generate
+        make build
+        exit
+        docker compose up -d
+        cd /root
+
         # installation de nushell
         curl -fsSL https://apt.fury.io/nushell/gpg.key | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/fury-nushell.gpg
         echo "deb https://apt.fury.io/nushell/ /" | sudo tee /etc/apt/sources.list.d/fury.list

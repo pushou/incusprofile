@@ -26,6 +26,7 @@ config:
       - file
       - sudo
       - sshpass
+      - ssh
       - jq
 
     write_files:
