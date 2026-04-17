@@ -23,6 +23,7 @@ config:
       - liblzma-dev
       - libssh-dev
       - python3-pip
+      - ncurses-term
 description: cloud init profile
 devices:
   agent:

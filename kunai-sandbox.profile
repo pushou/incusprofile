@@ -15,6 +15,7 @@ config:
       - xorriso
       - tcpdump
       - file
+      - ncurses-term
 
     write_files:
       - path: /root/.profile
@@ -77,6 +78,12 @@ config:
         
         # ajout magika pour la reconnaissance des types de fichiers
         curl -LsSf https://securityresearch.google/magika/install.sh | sh
+
+        # completion docker
+        if [ -f /usr/share/bash-completion/completions/docker ]; then
+            echo "source /usr/share/bash-completion/completions/docker" >> /root/.bashrc
+            echo "complete -o default docker" >> /root/bash.bashrc
+        fi
 
     # Définition du fuseau horaire
     timezone: Europe/Paris

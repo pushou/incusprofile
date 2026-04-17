@@ -16,6 +16,9 @@ config:
       - tcpdump
       - file
       - build-essential
+      - ncurses-term
+      - bash-completion
+      - upx-ucl
 
     write_files:
       - path: /root/.profile
@@ -33,6 +36,7 @@ config:
         set -e
         export PATH="/root/.local/bin:/root/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
         export HOME=/root
+
 
         # installation de nukunai
         git clone https://github.com/pushou/nukunai.git ~/nukunai
@@ -69,12 +73,10 @@ config:
         cd /root
         git clone https://github.com/beelzebub-labs/azazel.git
         cd azazel
+        sed -i -e 's/ -it//' -e 's/exec bash/make vmlinux;make generate;make build;exec bash/' Makefile
         make docker-dev
         make docker-dev-run
-        make vmlinux
-        make generate
-        make build
-        exit
+        cd /root/azazel
         docker compose up -d
         cd /root
 
@@ -106,14 +108,35 @@ config:
         # suricata update rules
         /usr/bin/suricata-update --no-test
 
-        # ajout du term
-
-        echo "export TERM=builtin_xterm\n" >> /root/.bashrc
         # probleme libguestfs
         echo "export LIBGUESTFS_BACKEND=direct LIBGUESTFS_DEBUG=1 LIBGUESTFS_TRACE=1"  >> /root/.bashrc
         
         # ajout magika pour la reconnaissance des types de fichiers
         curl -LsSf https://securityresearch.google/magika/install.sh | sh
+     
+        # completion docker
+        if [ -f /usr/share/bash-completion/completions/docker ]; then
+            echo "source /usr/share/bash-completion/completions/docker" >> /root/.bashrc
+            echo "complete -o default docker" >> /root/bash.bashrc
+        fi
+        
+        # term completion
+        #cat << 'EOF' >> /etc/bash.bashrc
+
+        # --- FIX COMPLETION & ALACRITTY ---
+        # Si on est dans un shell interactif
+        #if [ -z "$PS1" ]; then return; fi
+
+        # Charger la complétion si elle existe
+        #if [ -f /etc/bash_completion ]; then
+        #    . /etc/bash_completion
+        #fi
+
+        # Correction pour le terminal Alacritty
+        #export TERM=xterm-256color
+        # ----------------------------------
+        #EOF
+
 
     # Définition du fuseau horaire
     timezone: Europe/Paris

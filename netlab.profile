@@ -25,6 +25,7 @@ config:
       - python3-pip
       - tcpdump
       - ssh
+      - ncurses-term
     runcmd:
       - |
         #!/bin/bash
@@ -43,6 +44,12 @@ config:
         # Installation de fzf avec réponse automatique
         git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
         echo "yes" | ~/.fzf/install
+
+        # completion docker
+        if [ -f /usr/share/bash-completion/completions/docker ]; then
+            echo "source /usr/share/bash-completion/completions/docker" >> /root/.bashrc
+            echo "complete -o default docker" >> /root/bash.bashrc
+        fi
 
     # Définition du fuseau horaire
     timezone: Europe/Paris

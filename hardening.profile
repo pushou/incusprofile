@@ -28,6 +28,7 @@ config:
       - sshpass
       - ssh
       - jq
+      - ncurses-term
 
     write_files:
       - path: /root/.profile
@@ -56,8 +57,6 @@ config:
         apt update
         apt -y install nushell
 
-        # Correction du terme dans .bashrc
-        echo 'export TERM=xterm-256color' >> /root/.bashrc
 
     timezone: Europe/Paris
 
