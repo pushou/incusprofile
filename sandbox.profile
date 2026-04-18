@@ -19,6 +19,7 @@ config:
       - ncurses-term
       - bash-completion
       - upx-ucl
+      - jq
 
     write_files:
       - path: /root/.profile
@@ -28,7 +29,14 @@ config:
         content: |
           export PATH=$HOME/.local/bin:$PATH
           export LIBGUESTFS_BACKEND=direct LIBGUESTFS_DEBUG=1 LIBGUESTFS_TRACE=1
-          export SANDBOXES='/root/projetm/sandboxes'
+      - path: /root/.bashrc
+        append: true
+        content: |
+          # term completion
+          source /usr/share/bash-completion/completions/docker
+          complete -o default docker
+
+
 
     runcmd:
       - |
@@ -36,7 +44,8 @@ config:
         set -e
         export PATH="/root/.local/bin:/root/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
         export HOME=/root
-
+        # bon nom d'interface pour suricata
+        sed -i "s/eth0/$(ip route | grep default | awk '{print $5}')/g" /etc/suricata/suricata.yaml
 
         # installation de nukunai
         git clone https://github.com/pushou/nukunai.git ~/nukunai
@@ -92,12 +101,6 @@ config:
         # Installation de kunai-sandbox
         uv tool install https://github.com/kunai-project/sandbox.git
 
-        # installation de nushell
-        curl -fsSL https://apt.fury.io/nushell/gpg.key | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/fury-nushell.gpg
-        echo "deb https://apt.fury.io/nushell/ /" | sudo tee /etc/apt/sources.list.d/fury.list
-        apt update
-        apt -y install nushell
-
         # prepare sandbox
         mkdir -p /root/projetm/sandboxes
         export SANDBOXES='/root/projetm/sandboxes'
@@ -107,37 +110,12 @@ config:
 
         # suricata update rules
         /usr/bin/suricata-update --no-test
+        systemctl restart suricata
 
-        # probleme libguestfs
-        echo "export LIBGUESTFS_BACKEND=direct LIBGUESTFS_DEBUG=1 LIBGUESTFS_TRACE=1"  >> /root/.bashrc
         
         # ajout magika pour la reconnaissance des types de fichiers
         curl -LsSf https://securityresearch.google/magika/install.sh | sh
      
-        # completion docker
-        if [ -f /usr/share/bash-completion/completions/docker ]; then
-            echo "source /usr/share/bash-completion/completions/docker" >> /root/.bashrc
-            echo "complete -o default docker" >> /root/bash.bashrc
-        fi
-        
-        # term completion
-        #cat << 'EOF' >> /etc/bash.bashrc
-
-        # --- FIX COMPLETION & ALACRITTY ---
-        # Si on est dans un shell interactif
-        #if [ -z "$PS1" ]; then return; fi
-
-        # Charger la complétion si elle existe
-        #if [ -f /etc/bash_completion ]; then
-        #    . /etc/bash_completion
-        #fi
-
-        # Correction pour le terminal Alacritty
-        #export TERM=xterm-256color
-        # ----------------------------------
-        #EOF
-
-
     # Définition du fuseau horaire
     timezone: Europe/Paris
 description: cloud init profile
