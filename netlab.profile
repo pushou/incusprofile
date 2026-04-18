@@ -26,6 +26,21 @@ config:
       - tcpdump
       - ssh
       - ncurses-term
+
+    write_files:
+      - path: /root/.profile
+        permissions: '0600'
+        defer: true
+        append: true
+        content: |
+          export PATH=$HOME/.local/bin:$PATH
+          export LIBGUESTFS_BACKEND=direct LIBGUESTFS_DEBUG=1 LIBGUESTFS_TRACE=1
+      - path: /root/.bashrc
+        append: true
+        content: |
+          # term completion
+          source /usr/share/bash-completion/completions/docker
+          complete -o default docker
     runcmd:
       - |
         #!/bin/bash
@@ -45,11 +60,6 @@ config:
         git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
         echo "yes" | ~/.fzf/install
 
-        # completion docker
-        if [ -f /usr/share/bash-completion/completions/docker ]; then
-            echo "source /usr/share/bash-completion/completions/docker" >> /root/.bashrc
-            echo "complete -o default docker" >> /root/bash.bashrc
-        fi
 
     # Définition du fuseau horaire
     timezone: Europe/Paris
