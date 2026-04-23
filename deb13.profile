@@ -6,13 +6,19 @@ config:
       list: |
         root:root
         test:test
+        student:student
       expire: False
 
     users:
       - name: test
         groups: sudo
         shell: /bin/bash
-        sudo: ['ALL=(ALL) NOPASSWD:ALL']
+        sudo: ALL=(ALL) NOPASSWD:ALL
+        lock_passwd: false
+      - name: student
+        groups: sudo
+        shell: /bin/bash
+        sudo: ALL=(ALL) NOPASSWD:ALL
         lock_passwd: false
 
     packages:
@@ -28,6 +34,11 @@ config:
       - ssh
       - jq
       - ncurses-term
+      - libcap-ng-utils
+      - firejail
+      - mtr
+      - tcpdump
+      - attr
 
     write_files:
       - path: /root/.profile
@@ -55,6 +66,22 @@ config:
         echo "deb https://apt.fury.io/nushell/ /" | tee /etc/apt/sources.list.d/fury.list
         apt update
         apt -y install nushell
+
+        # Add Docker's official GPG key:
+        install -m 0755 -d /etc/apt/keyrings
+        curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+        chmod a+r /etc/apt/keyrings/docker.asc
+
+        # Add the repository to Apt sources:
+        tee /etc/apt/sources.list.d/docker.sources <<EOF
+        Types: deb
+        URIs: https://download.docker.com/linux/debian
+        Suites: $(. /etc/os-release && echo "$VERSION_CODENAME")
+        Components: stable
+        Signed-By: /etc/apt/keyrings/docker.asc
+        EOF
+        apt update
+        apt -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 
     timezone: Europe/Paris
