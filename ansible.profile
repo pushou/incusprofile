@@ -62,6 +62,5 @@ devices:
     size: 50GiB
     type: disk
 name: ansible-profile
-name: ansible
 used_by: []
 project: default
